@@ -42,6 +42,11 @@ internal class ArchiveUnpackerV1 : Unpacker
 		Stopwatch overallStopWatch = Stopwatch.StartNew();
 		Stopwatch currentStopwatch = Stopwatch.StartNew();
 		
+		// Beware: Create output directory before checking CoW support because on Linux the folder must already exist 
+		// to be able to retrieve its volume.
+		if (!Directory.Exists(options.OutputDirectoryPath))
+			Directory.CreateDirectory(options.OutputDirectoryPath);
+
 		bool isCopyOnWriteEnabled = IsCopyOnWriteEnabled(options);
 
 		await Logger.InfoLine($"Using {options.MaxDegreeOfParallelism} of {Environment.ProcessorCount} logical cores.");
@@ -51,9 +56,6 @@ internal class ArchiveUnpackerV1 : Unpacker
 		await Logger.StartTextProgress("Reading manifest ...");
 		Manifest manifest = await GetManifestFromFile(inputFile);
 		await Logger.FinishTextProgress($"Got manifest in {currentStopwatch.Elapsed}.");
-
-		if (!Directory.Exists(options.OutputDirectoryPath))
-			Directory.CreateDirectory(options.OutputDirectoryPath);
 
 		currentStopwatch.Restart();
 		await Logger.StartTextProgress("Filtering files and directories to extract...");
