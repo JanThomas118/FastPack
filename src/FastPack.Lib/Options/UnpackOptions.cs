@@ -23,5 +23,5 @@ public class UnpackOptions : FilterOptions, IOptions
 	public bool RestoreDates { get; set; } = true;
 	public bool RestorePermissions { get; set; } = true;
 	public bool IgnoreDiskSpaceCheck { get; set; }
-	public bool OptimizeForCopyOnWriteFilesystem { get; set; }
+	public OptimizeForCopyOnWriteFilesystem OptimizeForCopyOnWriteFilesystem { get; set; }
 }

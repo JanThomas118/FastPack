@@ -79,10 +79,11 @@ public class UnpackOptionsParser : IOptionsParser
 		await Logger.InfoLine("  -cow|--copy-on-write");
 		await Logger.InfoLine("    Optimize extraction for filesystems that support copy on write (e.g. ReFS/Microsoft DevDrive/Btrfs).");
 		await Logger.InfoLine("    Identical files will only take up disk space once but changes to one of them are still independent from copies.");
-		await Logger.InfoLine("    On Windows this requires Windows 11 24H2 or Windows Server 2025");
-		await Logger.InfoLine("    Default: Not active (Minimize IO for best performance on traditional file systems)");
+		await Logger.InfoLine("    On Windows this requires Windows 11 24H2 or Windows Server 2025 to work correctly");
+		await Logger.InfoLine("    Valid values: auto, on, off");
 		await Logger.InfoLine("    Required: false");
-		await Logger.InfoLine("    Example: -cow");
+		await Logger.InfoLine("    Default: auto");
+		await Logger.InfoLine("    Example: -cow off");
 		await Logger.InfoLine();
 		await Logger.InfoLine("  -dr|--dryrun [detailed]");
 		await Logger.InfoLine("    Only perform the action as dry run meaning no files will be written and only information about the actions will be returned.");
@@ -180,7 +181,7 @@ public class UnpackOptionsParser : IOptionsParser
 		parameterProcessingMap.AddMultiple(new[] { "-nd", "--no-dates" }, _ => { options.RestoreDates = false; return Task.FromResult(true); });
 		parameterProcessingMap.AddMultiple(new[] { "-nfp", "--no-permissions" }, _ => { options.RestorePermissions = false; return Task.FromResult(true); });
 		parameterProcessingMap.AddMultiple(new[] { "-isc", "--ignore-space-check" }, _ => Task.FromResult(options.IgnoreDiskSpaceCheck = true));
-		parameterProcessingMap.AddMultiple(new[] { "-cow", "--copy-on-write" }, _ => Task.FromResult(options.OptimizeForCopyOnWriteFilesystem = true));
+		parameterProcessingMap.AddMultiple(new[] { "-cow", "--copy-on-write" }, async _ => await argumentsParser.ProcessEnumParameterValue<OptimizeForCopyOnWriteFilesystem>(v => options.OptimizeForCopyOnWriteFilesystem = v));
 
 		return await argumentsParser.Parse(parameterProcessingMap) ? options : null;
 	}

@@ -41,8 +41,11 @@ internal class ArchiveUnpackerV1 : Unpacker
 	{
 		Stopwatch overallStopWatch = Stopwatch.StartNew();
 		Stopwatch currentStopwatch = Stopwatch.StartNew();
+		
+		bool isCopyOnWriteEnabled = IsCopyOnWriteEnabled(options);
 
 		await Logger.InfoLine($"Using {options.MaxDegreeOfParallelism} of {Environment.ProcessorCount} logical cores.");
+		await Logger.InfoLine($"Using unpack algorithm optimized for copy-on-write filesystems: {isCopyOnWriteEnabled}");
 		await Logger.InfoLine($"Unpacking '{inputFile}'...");
 			
 		await Logger.StartTextProgress("Reading manifest ...");
@@ -87,7 +90,7 @@ internal class ArchiveUnpackerV1 : Unpacker
 
 		currentStopwatch.Restart();
 		await Logger.StartTextProgress("Extracting files ...");
-		await UnpackFiles(options, manifest.Entries.Where(x => x.Type == EntryType.File), manifest, inputFile);
+		await UnpackFiles(options, manifest.Entries.Where(x => x.Type == EntryType.File), manifest, inputFile, isCopyOnWriteEnabled);
 		await Logger.FinishTextProgress($"Extracted files in {currentStopwatch.Elapsed}.");
 
 		if (options.RestoreDates || options.RestorePermissions)
@@ -153,7 +156,7 @@ internal class ArchiveUnpackerV1 : Unpacker
 		});
 	}
 
-	private async Task UnpackFiles(UnpackOptions options, IEnumerable<ManifestEntry> manifestEntries, Manifest manifest, string inputFile)
+	private async Task UnpackFiles(UnpackOptions options, IEnumerable<ManifestEntry> manifestEntries, Manifest manifest, string inputFile, bool isCopyOnWriteEnabled)
 	{
 		IFileCompressor fileCompressor = FileCompressorFactory.GetCompressor(manifest.CompressionAlgorithm);
 		
@@ -165,7 +168,7 @@ internal class ArchiveUnpackerV1 : Unpacker
 		await Parallel.ForEachAsync(allFileEntries, new ParallelOptions {
 				MaxDegreeOfParallelism = options.MaxDegreeOfParallelism.Value
 		}, async (fileEntry, _) => {
-			if (options.OptimizeForCopyOnWriteFilesystem)
+			if (isCopyOnWriteEnabled)
 				await DecompressManifestEntryCow(options, fileEntry, manifest, inputFile, fileCompressor);
 			else
 				await DecompressManifestEntry(options, fileEntry, manifest, inputFile, fileCompressor);
@@ -285,5 +288,12 @@ internal class ArchiveUnpackerV1 : Unpacker
 		await using Stream fileStream = new FileStream(inputFile, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.BufferSize, Constants.OpenFileStreamsAsync);
 		await using SubStream archiveSubStream = new(fileStream, manifestEntry.DataIndex, manifestEntry.DataSize);
 		await readFromStreamAction(archiveSubStream);
+	}
+
+	private static bool IsCopyOnWriteEnabled(UnpackOptions options)
+	{
+		return options.OptimizeForCopyOnWriteFilesystem == OptimizeForCopyOnWriteFilesystem.On ||
+				options.OptimizeForCopyOnWriteFilesystem == OptimizeForCopyOnWriteFilesystem.Auto &&
+				CopyOnWriteDiskInfo.DirectorySupportsCopyOnWrite(options.OutputDirectoryPath);
 	}
 }
