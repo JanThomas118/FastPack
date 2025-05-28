@@ -27,8 +27,17 @@ namespace FastPack.Lib
 
 		public static bool DirectorySupportsCopyOnWrite(string directory)
 		{
-			var driveInfo = new DriveInfo(directory);
-			return driveInfo.IsReady && FilesystemsWithCopyOnWrite.Contains(driveInfo.DriveFormat, StringComparer.OrdinalIgnoreCase);
+			try
+			{
+				var driveInfo = new DriveInfo(directory);
+				return driveInfo.IsReady &&
+						FilesystemsWithCopyOnWrite.Contains(driveInfo.DriveFormat, StringComparer.OrdinalIgnoreCase);
+			}
+			catch(ArgumentException)
+			{
+				// DriveInfo might fail if UNC paths are used. In that case we are going to assume that no CoW is supported.
+				return false;
+			}
 		}
 	}
 }
