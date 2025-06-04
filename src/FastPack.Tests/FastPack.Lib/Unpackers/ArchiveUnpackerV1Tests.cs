@@ -28,8 +28,8 @@ internal class ArchiveUnpackerV1Tests
 		{
 			get
 			{
-				yield return new TestCaseData(true);
-				yield return new TestCaseData(false);
+				yield return new TestCaseData(OptimizeForCopyOnWriteFilesystem.On);
+				yield return new TestCaseData(OptimizeForCopyOnWriteFilesystem.Off);
 			}
 		}
 	}
@@ -60,7 +60,7 @@ internal class ArchiveUnpackerV1Tests
 
 	[Test]
 	[TestCaseSource(typeof(UnpackOptionsTestData), nameof(UnpackOptionsTestData.TestCases))]
-	public async Task Ensure_Extract_TestCase1_Works(bool optimizeForCopyOnWriteFilesystem)
+	public async Task Ensure_Extract_TestCase1_Works(OptimizeForCopyOnWriteFilesystem optimizeForCopyOnWriteFilesystem)
 	{
 		// arrange
 		Mock<ILogger> loggerMock = new Mock<ILogger>();
@@ -90,7 +90,7 @@ internal class ArchiveUnpackerV1Tests
 
 	[Test]
 	[TestCaseSource(typeof(UnpackOptionsTestData), nameof(UnpackOptionsTestData.TestCases))]
-	public async Task Ensure_Extract_TestCase2_Works(bool optimizeForCopyOnWriteFilesystem)
+	public async Task Ensure_Extract_TestCase2_Works(OptimizeForCopyOnWriteFilesystem optimizeForCopyOnWriteFilesystem)
 	{
 		// arrange
 		Mock<ILogger> loggerMock = new Mock<ILogger>();
@@ -122,7 +122,7 @@ internal class ArchiveUnpackerV1Tests
 
 	[Test]
 	[TestCaseSource(typeof(UnpackOptionsTestData), nameof(UnpackOptionsTestData.TestCases))]
-	public async Task Ensure_Extract_TestCase3_Works(bool optimizeForCopyOnWriteFilesystem)
+	public async Task Ensure_Extract_TestCase3_Works(OptimizeForCopyOnWriteFilesystem optimizeForCopyOnWriteFilesystem)
 	{
 		// arrange
 		Mock<ILogger> loggerMock = new Mock<ILogger>();
