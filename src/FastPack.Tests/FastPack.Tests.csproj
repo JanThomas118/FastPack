@@ -8,8 +8,6 @@
     <!-- START: Default-Values for properties to prevent errors during solution publish (TreatAsLocalProperty ensures no override of property values by CLI) -->
     <SelfContained>false</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>../FastPack.snk</AssemblyOriginatorKeyFile>
 	<!-- END -->
   </PropertyGroup>
 
