@@ -11,7 +11,7 @@ using FastPack.Lib.Logging;
 using FastPack.Options;
 using FastPack.Options.Parsers;
 using FastPack.TestFramework.Common;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using NUnit.Framework;
 

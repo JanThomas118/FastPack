@@ -13,7 +13,7 @@ using FastPack.Lib.Matching;
 using FastPack.Lib.Options;
 using FastPack.Lib.Unpackers;
 using FastPack.TestFramework.Common;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using NUnit.Framework;
 

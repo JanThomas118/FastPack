@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FastPack.Lib;
 using FastPack.TestFramework;
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 
 namespace FastPack.Tests.FastPack.Lib;

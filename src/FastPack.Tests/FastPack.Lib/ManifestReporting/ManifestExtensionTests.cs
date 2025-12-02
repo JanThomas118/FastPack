@@ -5,7 +5,7 @@ using FastPack.Lib.Compression;
 using FastPack.Lib.Hashing;
 using FastPack.Lib.ManifestManagement;
 using FastPack.Lib.ManifestReporting;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using NUnit.Framework;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using FastPack.Lib;
 using FastPack.Lib.Hashing;
 using FastPack.TestFramework;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using NUnit.Framework;
 

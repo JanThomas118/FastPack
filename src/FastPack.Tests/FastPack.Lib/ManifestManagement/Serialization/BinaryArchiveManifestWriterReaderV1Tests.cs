@@ -7,7 +7,7 @@ using FastPack.Lib;
 using FastPack.Lib.Hashing;
 using FastPack.Lib.ManifestManagement;
 using FastPack.Lib.ManifestManagement.Serialization;
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 
 namespace FastPack.Tests.FastPack.Lib.ManifestManagement.Serialization;

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FastPack.CmdLine;
 using FastPack.TestFramework.Common;
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 
 namespace FastPack.Tests.FastPack.CmdLine
