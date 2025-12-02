@@ -1,5 +1,6 @@
 <Project>
 	<PropertyGroup>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
 		<VersionMajor>2</VersionMajor>
 		<VersionMinor>1</VersionMinor>
 		<VersionPatch>0</VersionPatch>
