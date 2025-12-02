@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FastPack.Lib.Hashing;
 using FastPack.Lib.Logging;

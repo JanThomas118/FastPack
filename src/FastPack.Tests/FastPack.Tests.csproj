@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="SelfContained;PublishTrimmed;RuntimeIdentifier">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <!-- START: Default-Values for properties to prevent errors during solution publish (TreatAsLocalProperty ensures no override of property values by CLI) -->
     <SelfContained>false</SelfContained>
@@ -49,7 +49,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="JUnitTestLogger" />
-    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>

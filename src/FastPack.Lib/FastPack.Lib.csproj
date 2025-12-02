@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>FastPack.Lib</RootNamespace>
     <AssemblyName>FastPack.Lib</AssemblyName>
     <Company>Quanos Solutions GmbH</Company>
@@ -36,8 +36,6 @@
     </PackageReference>
     <PackageReference Include="Mono.Posix.NETStandard" />
     <PackageReference Include="Standart.Hash.xxHash.Signed" />
-    <PackageReference Include="System.Text.Json" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="FastPack" />

@@ -5,7 +5,6 @@ using FastPack.Lib.Actions;
 using FastPack.Lib.Logging;
 using AwesomeAssertions;
 using Moq;
-using Moq.Protected;
 using NUnit.Framework;
 
 namespace FastPack.Tests.FastPack.Lib.Actions

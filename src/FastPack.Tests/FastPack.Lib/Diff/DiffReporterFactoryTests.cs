@@ -1,9 +1,7 @@
 ﻿using System;
 using FastPack.Lib;
-using FastPack.Lib.Compression;
 using FastPack.Lib.Diff;
 using FastPack.Lib.Logging;
-using FastPack.Lib.ManifestManagement;
 using AwesomeAssertions;
 using Moq;
 using NUnit.Framework;

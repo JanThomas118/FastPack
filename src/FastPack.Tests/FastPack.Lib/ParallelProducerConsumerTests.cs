@@ -8,7 +8,6 @@ using FastPack.Lib;
 using FastPack.Lib.TypeExtensions;
 using FastPack.TestFramework.Common;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace FastPack.Tests.FastPack.Lib;
 

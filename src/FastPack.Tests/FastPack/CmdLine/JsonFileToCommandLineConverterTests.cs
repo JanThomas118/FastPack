@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FastPack.CmdLine;
 using FastPack.TestFramework.Common;
 using AwesomeAssertions;
