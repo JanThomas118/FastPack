@@ -11,6 +11,7 @@ public class ActionFactory : IActionFactory
 		return actionType switch {
 			ActionType.About => new AboutAction(logger),
 			ActionType.Pack => new PackAction(logger, (PackOptions)options),
+			ActionType.TarPack => new TarPackAction(logger, (TarPackOptions)options),
 			ActionType.Diff => new DiffAction(logger, (DiffOptions)options),
 			ActionType.Unpack => new UnpackAction(logger, (UnpackOptions)options),
 			ActionType.Info => new InfoAction(logger, (InfoOptions)options),

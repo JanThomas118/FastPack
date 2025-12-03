@@ -4,6 +4,7 @@ public enum ActionType
 {
 	About,
 	Pack,
+	TarPack,
 	Unpack,
 	Diff,
 	Info,

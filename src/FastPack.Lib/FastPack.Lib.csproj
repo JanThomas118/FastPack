@@ -28,6 +28,7 @@
     <None Remove="Licenses\ThirdParty\ThirdPartyLicenses.json" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ZstdNet" />
     <PackageReference Include="DotNet.Glob" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
       <PrivateAssets>all</PrivateAssets>

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Formats.Tar;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FastPack.Lib.Compression;
@@ -17,6 +21,7 @@ using FastPack.Lib.ManifestReporting;
 using FastPack.Lib.Matching;
 using FastPack.Lib.Options;
 using FastPack.Lib.TypeExtensions;
+using ZstdNet;
 
 namespace FastPack.Lib.Actions;
 
@@ -117,10 +122,85 @@ public class PackAction : IAction
 			return 0;
 		}
 
+		await WriteFupTar(manifest);
+		//await WriteFupConventional(compressor, manifest, compressionLevel);
+
+		await Logger.FinishTextProgress($"FastPack packed in {currentStopwatch.Elapsed}.");
+		await Logger.FinishTextProgress($"Finished in {overallStopWatch.Elapsed}.");
+
+		return 0;
+	}
+
+	private async Task WriteFupTar(Manifest manifest)
+	{
+		manifest.Entries = manifest.Entries.OrderBy(x => x.FileSystemEntries.GroupBy(g => Path.GetExtension(g.RelativePath)).MaxBy(m => m.Count()).Key)
+			.ToList();
+		await using var outputFile = new FileStream(Options.OutputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, Constants.BufferSize, Constants.OpenFileStreamsAsync);
+		//await using var deflateStream = new GZipStream(outputFile, CompressionLevel.SmallestSize);
+		var zstdParams = new Dictionary<ZSTD_cParameter, int>()
+		{
+			[ZSTD_cParameter.ZSTD_c_nbWorkers] = Environment.ProcessorCount,
+			[ZSTD_cParameter.ZSTD_c_enableLongDistanceMatching] = 1,
+			[ZSTD_cParameter.ZSTD_c_windowLog] = 27,
+		};
+		await using var deflateStream = new CompressionStream(outputFile, new CompressionOptions(null, zstdParams,12));
+		await using var tarWriter = new TarWriter(deflateStream, TarEntryFormat.Pax);
+
+		var manifestReport = manifest.CreateManifestReport(FileCompressorFactory, false, true);
+		var manifestTarEntry = new PaxTarEntry(TarEntryType.RegularFile, "quanos-fastpack.manifest.json");
+		using var manifestStream = new MemoryStream();
+		await JsonSerializer.SerializeAsync(manifestStream, manifestReport, new ManifestReportJsonContext(JsonHelper.GetSerializerOptions(true)).ManifestReport);
+		manifestStream.Seek(0, SeekOrigin.Begin);
+		manifestTarEntry.DataStream = manifestStream;
+		await tarWriter.WriteEntryAsync(manifestTarEntry);
+		
+		foreach (var manifestEntry in manifest.Entries)
+		{
+			if (manifestEntry.Type == EntryType.Directory)
+			{
+				foreach (var manifestDirectoryEntry in manifestEntry.FileSystemEntries)
+				{
+					var tarDirectoryEntry = new PaxTarEntry(TarEntryType.Directory, manifestDirectoryEntry.RelativePath);
+					if (manifestDirectoryEntry.LastWriteDateUtc != null)
+						tarDirectoryEntry.ModificationTime = new DateTimeOffset((DateTime)manifestDirectoryEntry.LastWriteDateUtc);
+					if (manifestDirectoryEntry.FilePermissions != null)
+						tarDirectoryEntry.Mode = (UnixFileMode)manifestDirectoryEntry.FilePermissions;
+					await tarWriter.WriteEntryAsync(tarDirectoryEntry);
+				}
+			}
+			else
+			{
+				if (manifestEntry.FileSystemEntries.Count > 0)
+				{
+					var firstManifestFileEntry = manifestEntry.FileSystemEntries[0];
+					var tarDirectoryEntry = new PaxTarEntry(TarEntryType.RegularFile, firstManifestFileEntry.RelativePath);
+					if (firstManifestFileEntry.LastWriteDateUtc != null)
+						tarDirectoryEntry.ModificationTime = new DateTimeOffset((DateTime)firstManifestFileEntry.LastWriteDateUtc);
+					if (firstManifestFileEntry.FilePermissions != null)
+						tarDirectoryEntry.Mode = (UnixFileMode)firstManifestFileEntry.FilePermissions;
+					await using var fileStream = File.OpenRead(Path.Combine(Options.InputDirectoryPath, firstManifestFileEntry.RelativePath));
+					tarDirectoryEntry.DataStream = fileStream;
+					await tarWriter.WriteEntryAsync(tarDirectoryEntry);
+					
+					foreach (var linkedManifestFileSystemEntry in manifestEntry.FileSystemEntries.Skip(1))
+					{
+						var linkedTarEntry = new PaxTarEntry(TarEntryType.HardLink, linkedManifestFileSystemEntry.RelativePath) 
+						{ 
+							LinkName = firstManifestFileEntry.RelativePath
+						};
+						await tarWriter.WriteEntryAsync(linkedTarEntry);
+					}
+				}
+			}
+		}
+	}
+
+	private async Task WriteFupConventional(IFileCompressor compressor, Manifest manifest, ushort compressionLevel)
+	{
 		IArchiveFileWriter archiveFileWriter = ArchiveSerializerFactory.GetFileWriter(Constants.CurrentManifestVersion); // as soon as we have different versions here, pass them via command line and also here
 
 		// we order descending here, because a large file at first will fully occupy the consumer (sequential file write)
-		List<ManifestEntryWithCompressedStream> allFileEntries = manifestEntries.Where(x => x.Type == EntryType.File).OfType<ManifestEntryWithCompressedStream>().OrderByDescending(x => x.OriginalSize).ToList();
+		List<ManifestEntryWithCompressedStream> allFileEntries = manifest.Entries.Where(x => x.Type == EntryType.File).OfType<ManifestEntryWithCompressedStream>().OrderByDescending(x => x.OriginalSize).ToList();
 
 		// Write FUP file...
 		await using (FileStream stream = new(Options.OutputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, Constants.BufferSize, Constants.OpenFileStreamsAsync))
@@ -183,13 +263,8 @@ public class PackAction : IAction
 				fileProgress.Report(filesProcessed);
 			}
 		}
-
-		await Logger.FinishTextProgress($"FastPack packed {allFileEntries.Count} unique files (of {filteredFileInfos.Count}) and {filteredDirectoryInfos.Count} directories in {currentStopwatch.Elapsed}.");
-		await Logger.FinishTextProgress($"Finished in {overallStopWatch.Elapsed}.");
-
-		return 0;
 	}
-
+	
 	[ExcludeFromCodeCoverage]
 	private static void SetMetaDataOptionsForUnix(Manifest manifest)
 	{
