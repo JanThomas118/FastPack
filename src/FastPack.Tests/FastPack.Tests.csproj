@@ -56,21 +56,4 @@
     <ProjectReference Include="..\FastPack.TestFramework\FastPack.TestFramework.csproj" />
     <ProjectReference Include="..\FastPack\FastPack.csproj" />
   </ItemGroup>
-
-  <Target Name="CopyNativeLinuxDependencies" AfterTargets="Build" Condition="'$(NativeDependencyPlatform)' == 'linux-x64'">
-    <ItemGroup>
-      <NativeDependencies Include="$(PkgMono_Posix_NETStandard)/runtimes/linux-x64/native/*.*" />
-    </ItemGroup>
-    <Message Importance="High" Text="&gt;&gt; Copying @(NativeDependencies) to $(TargetDir)" />
-    <Copy SourceFiles="@(NativeDependencies)" DestinationFolder="$(TargetDir)" />
-  </Target>
-
-  <Target Name="CopyNativeOsxDependencies" AfterTargets="Build" Condition="'$(NativeDependencyPlatform)' == 'osx-x64'">
-    <ItemGroup>
-      <NativeDependencies Include="$(PkgMono_Posix_NETStandard)/runtimes/osx/native/*.*" />
-    </ItemGroup>
-    <Message Importance="High" Text="&gt;&gt; Copying @(NativeDependencies) to $(TargetDir)" />
-    <Copy SourceFiles="@(NativeDependencies)" DestinationFolder="$(TargetDir)" />
-  </Target>
-
 </Project>

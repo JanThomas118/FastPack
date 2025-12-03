@@ -24,7 +24,6 @@
   <ItemGroup>
     <None Remove="Licenses\FastPackLicense.txt" />
     <None Remove="Licenses\ThirdParty\DotNet.Glob.txt" />
-    <None Remove="Licenses\ThirdParty\Mono.Posix.NETStandard.txt" />
     <None Remove="Licenses\ThirdParty\Standart.Hash.xxHash.txt" />
     <None Remove="Licenses\ThirdParty\ThirdPartyLicenses.json" />
   </ItemGroup>
@@ -34,7 +33,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mono.Posix.NETStandard" />
     <PackageReference Include="Standart.Hash.xxHash.Signed" />
   </ItemGroup>
   <ItemGroup>
@@ -49,7 +47,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Licenses\FastPackLicense.txt" />
     <EmbeddedResource Include="Licenses\ThirdParty\DotNet.Glob.txt" />
-    <EmbeddedResource Include="Licenses\ThirdParty\Mono.Posix.NETStandard.txt" />
     <EmbeddedResource Include="Licenses\ThirdParty\Standart.Hash.xxHash.txt" />
     <EmbeddedResource Include="Licenses\ThirdParty\ThirdPartyLicenses.json" />
   </ItemGroup>
